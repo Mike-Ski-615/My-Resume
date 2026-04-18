@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { IconArrowsMaximize, IconArrowsMinimize } from "@tabler/icons-react";
 import ReactMarkdown, { type Components } from "react-markdown";
-import { useIntl } from "react-intl";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,9 +9,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { TabsContent } from "@/components/ui/tabs";
+import { useSiteContent } from "@/hooks/useSiteContent";
 import type { Language } from "@/provider/language-provider";
 import { cn } from "@/lib/utils";
-import type { ProjectSlug } from "@/data/projects";
+import type { ProjectSlug } from "@/content";
 
 type ReadmeTabProps = {
   locale: Language;
@@ -73,7 +73,7 @@ const markdownComponents: Components = {
 };
 
 export function ReadmeTab({ locale, slug }: ReadmeTabProps) {
-  const intl = useIntl();
+  const { ui } = useSiteContent();
   const [markdown, setMarkdown] = useState("");
   const [isMarkdownLoading, setIsMarkdownLoading] = useState(true);
   const [markdownError, setMarkdownError] = useState<string | null>(null);
@@ -103,9 +103,7 @@ export function ReadmeTab({ locale, slug }: ReadmeTabProps) {
         }
 
         setMarkdown("");
-        setMarkdownError(
-          intl.formatMessage({ id: "projectDetail.readmeError" }),
-        );
+        setMarkdownError(ui.projectDetail.readmeError);
       } finally {
         if (isCurrent) {
           setIsMarkdownLoading(false);
@@ -118,12 +116,12 @@ export function ReadmeTab({ locale, slug }: ReadmeTabProps) {
     return () => {
       isCurrent = false;
     };
-  }, [intl, locale, slug]);
+  }, [locale, slug, ui.projectDetail.readmeError]);
 
   const renderReadmeContent = () =>
     isMarkdownLoading ? (
       <p className="text-sm text-muted-foreground">
-        {intl.formatMessage({ id: "projectDetail.readmeLoading" })}
+        {ui.projectDetail.readmeLoading}
       </p>
     ) : markdownError ? (
       <p className="text-sm text-muted-foreground">{markdownError}</p>
@@ -142,9 +140,7 @@ export function ReadmeTab({ locale, slug }: ReadmeTabProps) {
             variant="ghost"
             size="icon-lg"
             className="pointer-events-auto bg-background/70 backdrop-blur"
-            aria-label={intl.formatMessage({
-              id: "projectDetail.readmeEnterFullscreen",
-            })}
+            aria-label={ui.projectDetail.readmeEnterFullscreen}
             onClick={() => setIsReadmeFullscreen(true)}
           >
             <IconArrowsMaximize data-icon="inline-start" />
@@ -159,7 +155,9 @@ export function ReadmeTab({ locale, slug }: ReadmeTabProps) {
           showCloseButton={false}
           className="inset-0 top-0 left-0 block h-dvh max-w-none translate-x-0 translate-y-0 overflow-y-auto rounded-none bg-background p-0 text-foreground ring-0 duration-200 no-scrollbar data-closed:slide-out-to-bottom-2 data-open:slide-in-from-bottom-2 sm:max-w-none"
         >
-          <DialogTitle className="sr-only">README</DialogTitle>
+          <DialogTitle className="sr-only">
+            {ui.projectDetail.tabs.readme}
+          </DialogTitle>
 
           <div className="pointer-events-none sticky inset-x-0 top-0 z-10 flex justify-end p-4">
             <DialogClose asChild>
@@ -168,9 +166,7 @@ export function ReadmeTab({ locale, slug }: ReadmeTabProps) {
                 variant="ghost"
                 size="icon-lg"
                 className="pointer-events-auto bg-background/70 backdrop-blur"
-                aria-label={intl.formatMessage({
-                  id: "projectDetail.readmeExitFullscreen",
-                })}
+                aria-label={ui.projectDetail.readmeExitFullscreen}
               >
                 <IconArrowsMinimize data-icon="inline-start" />
               </Button>

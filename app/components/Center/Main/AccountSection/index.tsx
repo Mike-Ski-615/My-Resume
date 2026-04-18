@@ -4,71 +4,12 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { useIntl } from "react-intl";
+import { useSiteContent } from "@/hooks/useSiteContent";
+import { siteConfig } from "@/site.config";
+import type { SocialLinkConfig } from "@/types";
 
-type HoverSide = "left" | "top" | "bottom" | "right";
-
-type SocialLink = {
-  label: string;
-  href: string;
-  side: HoverSide;
-  profile: {
-    nameId: string;
-    emailId: string;
-    signatureId?: string;
-  };
-};
-
-const socialLinks: SocialLink[] = [
-  {
-    label: "GitHub",
-    href: "https://github.com/",
-    side: "left",
-    profile: {
-      nameId: "accountSection.github.name",
-      emailId: "accountSection.github.email",
-      signatureId: "accountSection.github.signature",
-    },
-  },
-  {
-    label: "Rednote",
-    href: "https://www.xiaohongshu.com/",
-    side: "bottom",
-    profile: {
-      nameId: "accountSection.rednote.name",
-      emailId: "accountSection.rednote.email",
-      signatureId: "accountSection.rednote.signature",
-    },
-  },
-  {
-    label: "Tiktok",
-    href: "https://www.tiktok.com/",
-    side: "bottom",
-    profile: {
-      nameId: "accountSection.tiktok.name",
-      emailId: "accountSection.tiktok.email",
-      signatureId: "accountSection.tiktok.signature",
-    },
-  },
-  {
-    label: "Discord",
-    href: "https://discord.com/",
-    side: "bottom",
-    profile: {
-      nameId: "accountSection.discord.name",
-      emailId: "accountSection.discord.email",
-    },
-  },
-];
-
-function SocialHoverCardItem({ social }: { social: SocialLink }) {
-  const intl = useIntl();
-  const name = intl.formatMessage({ id: social.profile.nameId });
-  const email = intl.formatMessage({ id: social.profile.emailId });
-  const signature = social.profile.signatureId
-    ? intl.formatMessage({ id: social.profile.signatureId })
-    : null;
-  const initials = name.slice(0, 1).toUpperCase();
+function SocialHoverCardItem({ social }: { social: SocialLinkConfig }) {
+  const initials = social.profile.name.trim().slice(0, 1).toUpperCase();
 
   return (
     <HoverCard openDelay={100} closeDelay={100}>
@@ -84,15 +25,19 @@ function SocialHoverCardItem({ social }: { social: SocialLink }) {
         className="w-72 bg-popover p-3 ring-1 ring-border/60"
       >
         <div className="flex items-start gap-3">
-          <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground shadow-sm">
+          <div className="type-display flex size-11 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground shadow-sm">
             {initials}
           </div>
           <div className="flex min-w-0 flex-col gap-1">
-            <p className="truncate font-semibold leading-none">{name}</p>
-            <p className="truncate text-xs text-muted-foreground">{email}</p>
-            {signature ? (
+            <p className="type-display truncate font-semibold leading-none">
+              {social.profile.name}
+            </p>
+            <p className="type-meta truncate text-xs text-muted-foreground">
+              {social.profile.subtitle}
+            </p>
+            {social.profile.description ? (
               <p className="text-xs leading-relaxed text-foreground/90">
-                {signature}
+                {social.profile.description}
               </p>
             ) : null}
           </div>
@@ -103,14 +48,21 @@ function SocialHoverCardItem({ social }: { social: SocialLink }) {
 }
 
 export default function AccountSection() {
-  const intl = useIntl();
+  const { ui } = useSiteContent();
+  const socialLinks = siteConfig.contact.socials.filter((social) =>
+    social.href.trim(),
+  );
+
+  if (socialLinks.length === 0) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col gap-2">
       <p>
-        {intl.formatMessage({ id: "accountSection.prefix" })}{" "}
+        {ui.actions.accountPrefix}{" "}
         <span className="font-semibold">
-          {intl.formatMessage({ id: "accountSection.socials" })}
+          {ui.actions.accountHighlight}
         </span>
       </p>
       <div className="flex flex-wrap gap-2">

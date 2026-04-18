@@ -1,5 +1,4 @@
 import { Badge } from "@/components/ui/badge";
-import { useIntl } from "react-intl";
 import {
   IconBriefcase,
   IconSchool,
@@ -10,54 +9,40 @@ import {
   IconCoffee,
   IconMoon,
 } from "@tabler/icons-react";
+import { useSiteContent } from "@/hooks/useSiteContent";
+import type { BadgeIconKey } from "@/types";
 
-const badges = [
-  {
-    id: "badge.open_to_work",
-    icon: IconBriefcase,
-  },
-  {
-    id: "badge.undergraduate",
-    icon: IconSchool,
-  },
-  {
-    id: "badge.full_stack",
-    icon: IconCode,
-  },
-  {
-    id: "badge.open_source",
-    icon: IconStar,
-  },
-  {
-    id: "badge.indie_hacker",
-    icon: IconRocket,
-  },
-  {
-    id: "badge.fast_learner",
-    icon: IconBolt,
-  },
-  {
-    id: "badge.coffee_driven",
-    icon: IconCoffee,
-  },
-  {
-    id: "badge.night_coder",
-    icon: IconMoon,
-  },
-];
+const badgeIconMap: Record<BadgeIconKey, typeof IconBriefcase> = {
+  briefcase: IconBriefcase,
+  school: IconSchool,
+  code: IconCode,
+  star: IconStar,
+  rocket: IconRocket,
+  bolt: IconBolt,
+  coffee: IconCoffee,
+  moon: IconMoon,
+};
 
 export default function BadgeBar() {
-  const intl = useIntl();
+  const {
+    home: {
+      about: { badges },
+    },
+  } = useSiteContent();
 
   return (
     <div className="flex flex-wrap gap-2">
       {badges.map((badge) => {
-        const Icon = badge.icon;
+        const Icon = badgeIconMap[badge.icon];
 
         return (
-          <Badge key={badge.id} variant="secondary">
+          <Badge
+            key={badge.id}
+            variant="secondary"
+            className="type-meta border-border/60 bg-secondary/80"
+          >
             <Icon aria-hidden="true" />
-            {intl.formatMessage({ id: badge.id })}
+            {badge.label}
           </Badge>
         );
       })}

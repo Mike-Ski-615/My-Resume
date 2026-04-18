@@ -1,11 +1,11 @@
-import type { Project } from "@/data/projects";
+import type { ProjectRecord, ProjectSlug } from "@/content";
 import { useLanguage } from "@/provider/language-provider";
 import { OverviewTab } from "./OverviewTab";
 import { ReadmeTab } from "./ReadmeTab";
 import { WebsiteTab } from "./WebsiteTab";
 
 type MainProps = {
-  project: Project;
+  project: ProjectRecord[ProjectSlug];
 };
 
 export default function Main({ project }: MainProps) {

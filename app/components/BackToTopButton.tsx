@@ -1,15 +1,15 @@
 import { ArrowUpIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useIntl } from "react-intl";
 
 import { Button } from "@/components/ui/button";
+import { useSiteContent } from "@/hooks/useSiteContent";
 import { cn } from "@/lib/utils";
 
 const topThreshold = 2;
 const scrollIdleDelay = 140;
 
 export function BackToTopButton() {
-  const intl = useIntl();
+  const { ui } = useSiteContent();
   const [isVisible, setIsVisible] = useState(false);
   const isVisibleRef = useRef(false);
   const isScrollingRef = useRef(false);
@@ -136,7 +136,7 @@ export function BackToTopButton() {
       type="button"
       variant="outline"
       size="icon-lg"
-      aria-label={intl.formatMessage({ id: "common.backToTop" })}
+      aria-label={ui.common.backToTop}
       onClick={scrollToTop}
       className={cn(
         "fixed md:bottom-20 md:right-20 bottom-10 right-10 transition-all duration-200 outline-4",

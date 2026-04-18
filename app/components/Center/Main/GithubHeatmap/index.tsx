@@ -1,7 +1,8 @@
 import { ActivityCalendar } from "react-activity-calendar";
 import { useCallback, useMemo, type ReactElement, type SVGProps } from "react";
-import { useIntl } from "react-intl";
 import SectionHeader from "@/components/Center/SectionHeader";
+import { formatContentTemplate } from "@/content";
+import { useSiteContent } from "@/hooks/useSiteContent";
 import { useLanguage } from "@/provider/language-provider";
 
 const getDateSeed = (date: string) =>
@@ -55,22 +56,21 @@ function generateData(
 }
 
 export default function Calendar() {
-  const intl = useIntl();
+  const {
+    home: { github },
+  } = useSiteContent();
   const { locale } = useLanguage();
   const currentYear = new Date().getUTCFullYear();
   const calendarLocale = locale;
   const { data, tooltipByDate } = useMemo(
     () =>
       generateData(currentYear, calendarLocale, (date, count) =>
-        intl.formatMessage(
-          { id: "github.activity" },
-          {
-            date,
-            count,
-          },
-        ),
+        formatContentTemplate(github.activityTemplate, {
+          date,
+          count,
+        }),
       ),
-    [calendarLocale, currentYear, intl],
+    [calendarLocale, currentYear, github.activityTemplate],
   );
   const monthLabels = useMemo(
     () =>
@@ -87,26 +87,18 @@ export default function Calendar() {
   );
   const labels = useMemo(
     () => ({
-      totalCount: intl.formatMessage(
-        { id: "github.total" },
-        { count: "{{count}}", year: "{{year}}" },
-      ),
+      totalCount: formatContentTemplate(github.totalTemplate, {
+        count: "{{count}}",
+        year: "{{year}}",
+      }),
       legend: {
-        less: intl.formatMessage({ id: "github.less" }),
-        more: intl.formatMessage({ id: "github.more" }),
+        less: github.legend.less,
+        more: github.legend.more,
       },
-      weekdays: [
-        intl.formatMessage({ id: "github.weekday.sun" }),
-        intl.formatMessage({ id: "github.weekday.mon" }),
-        intl.formatMessage({ id: "github.weekday.tue" }),
-        intl.formatMessage({ id: "github.weekday.wed" }),
-        intl.formatMessage({ id: "github.weekday.thu" }),
-        intl.formatMessage({ id: "github.weekday.fri" }),
-        intl.formatMessage({ id: "github.weekday.sat" }),
-      ],
+      weekdays: github.weekdays,
       months: monthLabels,
     }),
-    [intl, monthLabels],
+    [github, monthLabels],
   );
   const renderBlock = useCallback(
     (
@@ -127,7 +119,7 @@ export default function Calendar() {
 
   return (
     <>
-      <SectionHeader>{intl.formatMessage({ id: "github.title" })}</SectionHeader>
+      <SectionHeader>{github.title}</SectionHeader>
       <div className="px-2 py-2 sm:px-4">
         <ActivityCalendar
           className="!w-full"

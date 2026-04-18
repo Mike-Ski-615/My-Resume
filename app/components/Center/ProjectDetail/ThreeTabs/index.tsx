@@ -1,32 +1,32 @@
 import { Separator } from "@/components/ui/separator";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Fragment } from "react";
-import { useIntl } from "react-intl";
+import { useSiteContent } from "@/hooks/useSiteContent";
 
 type ThreeTabsProps = {
   slug: string;
 };
 
 export default function ThreeTabs({ slug }: ThreeTabsProps) {
-  const intl = useIntl();
+  const { ui } = useSiteContent();
   const tabs = [
     {
       value: "overview",
-      label: intl.formatMessage({ id: "projectDetail.overview" }),
+      label: ui.projectDetail.tabs.overview,
     },
     {
       value: "readme",
-      label: intl.formatMessage({ id: "projectDetail.readme" }),
+      label: ui.projectDetail.tabs.readme,
     },
     {
       value: "website",
-      label: intl.formatMessage({ id: "projectDetail.website" }),
+      label: ui.projectDetail.tabs.website,
     },
   ];
 
   return (
     <TabsList
-      aria-label={intl.formatMessage({ id: "projectDetail.tabsLabel" })}
+      aria-label={ui.projectDetail.tabsLabel}
       variant="line"
       className="flex h-9 w-full min-w-0 rounded-none bg-transparent p-0 px-1.5 text-foreground"
     >

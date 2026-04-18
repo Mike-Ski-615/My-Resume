@@ -20,48 +20,41 @@ import {
   IconBrandRadixUi,
   IconBrandDocker,
 } from "@tabler/icons-react";
-import { useIntl } from "react-intl";
+import { useSiteContent } from "@/hooks/useSiteContent";
+import type { SkillIconKey } from "@/types";
 
-const skills = [
-  { name: "React", icon: IconBrandReact },
-  { name: "Next.js", icon: IconBrandNextjs },
-  { name: "Node.js", icon: IconBrandNodejs },
-  { name: "MongoDB", icon: IconBrandMongodb },
-  { name: "MySQL", icon: IconBrandMysql },
-  { name: "Prisma", icon: IconBrandPrisma },
-  { name: "Tailwind CSS", icon: IconBrandTailwind },
-  { name: "JavaScript", icon: IconBrandJavascript },
-  { name: "TypeScript", icon: IconBrandTypescript },
-  { name: "Git", icon: IconBrandGit },
-  { name: "GitHub", icon: IconBrandGithub },
-  { name: "Rust", icon: IconBrandRust },
-  { name: "Python", icon: IconBrandPython },
-  { name: "Three.js", icon: IconBrandThreejs },
-  { name: "Vite", icon: IconBrandVite },
-  { name: "Vue.js", icon: IconBrandVue },
-  { name: "Radix UI", icon: IconBrandRadixUi },
-  { name: "Docker", icon: IconBrandDocker },
-  { name: "Shadcn UI" },
-  { name: "Motion" },
-  { name: "GSAP" },
-  { name: "PostgreSQL" },
-  { name: "Bun" },
-  { name: "tRPC" },
-  { name: "pnpm" },
-  { name: "eslint" },
-];
+const skillIconMap: Record<SkillIconKey, typeof IconBrandReact> = {
+  nextjs: IconBrandNextjs,
+  react: IconBrandReact,
+  nodejs: IconBrandNodejs,
+  mongodb: IconBrandMongodb,
+  mysql: IconBrandMysql,
+  prisma: IconBrandPrisma,
+  tailwind: IconBrandTailwind,
+  javascript: IconBrandJavascript,
+  typescript: IconBrandTypescript,
+  git: IconBrandGit,
+  github: IconBrandGithub,
+  rust: IconBrandRust,
+  python: IconBrandPython,
+  threejs: IconBrandThreejs,
+  vite: IconBrandVite,
+  vue: IconBrandVue,
+  radix: IconBrandRadixUi,
+  docker: IconBrandDocker,
+};
 
 export default function SkillsTechnologies() {
-  const intl = useIntl();
+  const {
+    home: { skills },
+  } = useSiteContent();
 
   return (
     <>
-      <SectionHeader>
-        {intl.formatMessage({ id: "introduce.skills" })}
-      </SectionHeader>
+      <SectionHeader>{skills.title}</SectionHeader>
       <ul className="flex flex-wrap items-center justify-center gap-2 px-4 py-2">
-        {skills.map((skill) => {
-          const Icon = skill.icon;
+        {skills.items.map((skill) => {
+          const Icon = skill.icon ? skillIconMap[skill.icon] : null;
 
           return (
             <li key={skill.name}>

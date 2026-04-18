@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { IconCheck, IconCopy, IconDownload } from "@tabler/icons-react";
-import { useIntl } from "react-intl";
+import { useSiteContent } from "@/hooks/useSiteContent";
 import { Button } from "@/components/ui/button";
 import {
   InputGroup,
@@ -18,7 +18,7 @@ type WebsiteTabProps = {
 type CloneProtocol = "https" | "ssh" | "cli";
 
 export function WebsiteTab({ githubUrl }: WebsiteTabProps) {
-  const intl = useIntl();
+  const { ui } = useSiteContent();
   const [copiedCloneProtocol, setCopiedCloneProtocol] =
     useState<CloneProtocol | null>(null);
   const repository = useMemo(
@@ -37,16 +37,28 @@ export function WebsiteTab({ githubUrl }: WebsiteTabProps) {
     return {
       zip: `https://github.com/${repository.owner}/${repository.repo}/archive/refs/heads/main.zip`,
       protocols: [
-        { value: "https", label: "HTTPS", command: https },
-        { value: "ssh", label: "SSH", command: ssh },
-        { value: "cli", label: "GitHub CLI", command: cli },
+        {
+          value: "https",
+          label: ui.projectDetail.cloneProtocols.https,
+          command: https,
+        },
+        {
+          value: "ssh",
+          label: ui.projectDetail.cloneProtocols.ssh,
+          command: ssh,
+        },
+        {
+          value: "cli",
+          label: ui.projectDetail.cloneProtocols.cli,
+          command: cli,
+        },
       ] satisfies Array<{
         value: CloneProtocol;
         label: string;
         command: string;
       }>,
     };
-  }, [repository]);
+  }, [repository, ui.projectDetail.cloneProtocols]);
 
   const copyCloneCommand = async (protocol: CloneProtocol, command: string) => {
     if (typeof navigator === "undefined" || !navigator.clipboard) {
@@ -97,8 +109,8 @@ export function WebsiteTab({ githubUrl }: WebsiteTabProps) {
                     <InputGroupButton
                       aria-label={
                         copiedCloneProtocol === protocol.value
-                          ? intl.formatMessage({ id: "common.copied" })
-                          : intl.formatMessage({ id: "common.copy" })
+                          ? ui.common.copied
+                          : ui.common.copy
                       }
                       onClick={() =>
                         copyCloneCommand(protocol.value, protocol.command)
@@ -115,9 +127,7 @@ export function WebsiteTab({ githubUrl }: WebsiteTabProps) {
                 </InputGroup>
 
                 <p className="text-sm text-muted-foreground">
-                  {intl.formatMessage({
-                    id: "projectDetail.cloneDescription",
-                  })}
+                  {ui.projectDetail.cloneDescription}
                 </p>
               </TabsContent>
             ))}
@@ -128,14 +138,14 @@ export function WebsiteTab({ githubUrl }: WebsiteTabProps) {
               <Button asChild variant="ghost">
                 <a href={cloneCommands.zip}>
                   <IconDownload data-icon="inline-start" />
-                  {intl.formatMessage({ id: "projectDetail.downloadZip" })}
+                  {ui.projectDetail.downloadZip}
                 </a>
               </Button>
             </div>
           </Tabs>
         ) : (
           <p className="text-sm text-muted-foreground">
-            {intl.formatMessage({ id: "projectDetail.websiteUnavailable" })}
+            {ui.projectDetail.websiteUnavailable}
           </p>
         )}
       </div>

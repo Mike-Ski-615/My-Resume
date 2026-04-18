@@ -7,8 +7,13 @@ type SectionHeaderProps = {
 export default function SectionHeader({ children }: SectionHeaderProps) {
   return (
     <>
-      <header className="px-4 py-2">
-        <h2 className="text-lg font-medium tracking-tight">{children}</h2>
+      <header className="px-4 py-3 sm:py-3.5">
+        <h2
+          data-section-title="true"
+          className="type-display text-[1.02rem] font-semibold leading-tight text-title sm:text-[1.12rem]"
+        >
+          {children}
+        </h2>
       </header>
       <div className="double-divider" />
     </>

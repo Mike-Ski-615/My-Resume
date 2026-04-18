@@ -6,7 +6,6 @@ import {
   Sun,
   type LucideIcon,
 } from "lucide-react";
-import { useIntl } from "react-intl";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -22,40 +21,40 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useSiteContent } from "@/hooks/useSiteContent";
 import { cn } from "@/lib/utils";
 import {
-  type DividerStyle,
   useDividerStyle,
 } from "@/provider/divider-style-provider";
 import { type Language, useLanguage } from "@/provider/language-provider";
 import { useTheme } from "@/provider/theme-provider";
+import type { DividerStyle, Theme } from "@/types";
 
 type SettingsOption<T extends string> = {
   value: T;
-  labelId: string;
   icon?: LucideIcon;
 };
 
 const themeOptions = [
-  { value: "light", labelId: "settings.theme.light", icon: Sun },
-  { value: "dark", labelId: "settings.theme.dark", icon: Moon },
-  { value: "system", labelId: "settings.theme.system", icon: Monitor },
+  { value: "light", icon: Sun },
+  { value: "dark", icon: Moon },
+  { value: "system", icon: Monitor },
 ] as const satisfies readonly SettingsOption<string>[];
 
 const dividerOptions = [
-  { value: "double-solid", labelId: "settings.divider.double-solid" },
-  { value: "single-dashed", labelId: "settings.divider.single-dashed" },
-  { value: "soft-fade", labelId: "settings.divider.soft-fade" },
-  { value: "dot-chain", labelId: "settings.divider.dot-chain" },
-  { value: "hairline", labelId: "settings.divider.hairline" },
-  { value: "dash-dot", labelId: "settings.divider.dash-dot" },
-  { value: "center-glow", labelId: "settings.divider.center-glow" },
-  { value: "woven-grid", labelId: "settings.divider.woven-grid" },
+  { value: "double-solid" },
+  { value: "single-dashed" },
+  { value: "soft-fade" },
+  { value: "dot-chain" },
+  { value: "hairline" },
+  { value: "dash-dot" },
+  { value: "center-glow" },
+  { value: "woven-grid" },
 ] as const satisfies readonly SettingsOption<DividerStyle>[];
 
 const languageOptions = [
-  { value: "en-US", labelId: "settings.language.en", icon: Languages },
-  { value: "zh-CN", labelId: "settings.language.zh", icon: Languages },
+  { value: "en-US", icon: Languages },
+  { value: "zh-CN", icon: Languages },
 ] as const satisfies readonly SettingsOption<Language>[];
 
 type ThemeValue = (typeof themeOptions)[number]["value"];
@@ -86,10 +85,11 @@ function DividerPreview({
 }
 
 export function ModeToggle() {
-  const intl = useIntl();
+  const { ui } = useSiteContent();
   const { theme, setTheme } = useTheme();
   const { dividerStyle, setDividerStyle } = useDividerStyle();
   const { locale, setLocale } = useLanguage();
+  const settings = ui.settings;
 
   const onThemeChange = (value: string) => {
     if (isThemeValue(value)) {
@@ -115,29 +115,26 @@ export function ModeToggle() {
         <Button
           variant="outline"
           size="icon"
-          aria-label={intl.formatMessage({ id: "settings.button.aria" })}
+          aria-label={settings.buttonAria}
         >
           <Settings data-icon="inline-start" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>
-          {intl.formatMessage({ id: "settings.menu.label" })}
-        </DropdownMenuLabel>
+        <DropdownMenuLabel>{settings.menuLabel}</DropdownMenuLabel>
         <DropdownMenuSeparator />
 
-        <DropdownMenuLabel>
-          {intl.formatMessage({ id: "settings.menu.theme" })}
-        </DropdownMenuLabel>
+        <DropdownMenuLabel>{settings.themeLabel}</DropdownMenuLabel>
         <DropdownMenuGroup>
           <DropdownMenuRadioGroup value={theme} onValueChange={onThemeChange}>
             {themeOptions.map((option) => {
               const Icon = option.icon;
+              const label = settings.themeOptions[option.value as Theme];
 
               return (
                 <DropdownMenuRadioItem key={option.value} value={option.value}>
                   {Icon ? <Icon /> : null}
-                  {intl.formatMessage({ id: option.labelId })}
+                  {label}
                 </DropdownMenuRadioItem>
               );
             })}
@@ -146,14 +143,12 @@ export function ModeToggle() {
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuLabel>
-          {intl.formatMessage({ id: "settings.menu.divider" })}
-        </DropdownMenuLabel>
+        <DropdownMenuLabel>{settings.dividerLabel}</DropdownMenuLabel>
         <DropdownMenuGroup>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
               <DividerPreview value={dividerStyle} />
-              {intl.formatMessage({ id: "settings.divider.presets" })}
+              {settings.dividerPresets}
             </DropdownMenuSubTrigger>
             <DropdownMenuSubContent className="w-52">
               <DropdownMenuRadioGroup
@@ -169,7 +164,7 @@ export function ModeToggle() {
                     >
                       <DividerPreview value={option.value} />
                       <span className="truncate">
-                        {intl.formatMessage({ id: option.labelId })}
+                        {settings.dividerOptions[option.value]}
                       </span>
                     </DropdownMenuRadioItem>
                   );
@@ -181,9 +176,7 @@ export function ModeToggle() {
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuLabel>
-          {intl.formatMessage({ id: "settings.menu.language" })}
-        </DropdownMenuLabel>
+        <DropdownMenuLabel>{settings.languageLabel}</DropdownMenuLabel>
         <DropdownMenuGroup>
           <DropdownMenuRadioGroup value={locale} onValueChange={onLocaleChange}>
             {languageOptions.map((option) => {
@@ -192,7 +185,7 @@ export function ModeToggle() {
               return (
                 <DropdownMenuRadioItem key={option.value} value={option.value}>
                   {Icon ? <Icon /> : null}
-                  {intl.formatMessage({ id: option.labelId })}
+                  {settings.languageOptions[option.value]}
                 </DropdownMenuRadioItem>
               );
             })}

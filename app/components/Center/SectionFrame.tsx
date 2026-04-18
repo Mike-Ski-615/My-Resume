@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import type { HomeSectionDepth } from "@/types";
 
 type SectionFrameProps = {
   children: ReactNode;
@@ -7,6 +8,9 @@ type SectionFrameProps = {
   id?: string;
   innerClassName?: string;
   divider?: boolean;
+  tocDepth?: HomeSectionDepth;
+  tocLabel?: string;
+  hideFromToc?: boolean;
 };
 
 export default function SectionFrame({
@@ -15,10 +19,16 @@ export default function SectionFrame({
   id,
   innerClassName,
   divider = true,
+  tocDepth = 2,
+  tocLabel,
+  hideFromToc = false,
 }: SectionFrameProps) {
   return (
     <section
       id={id}
+      data-toc-section={id && !hideFromToc ? "true" : undefined}
+      data-toc-depth={id && !hideFromToc ? String(tocDepth) : undefined}
+      data-toc-label={id && !hideFromToc ? tocLabel : undefined}
       className={cn("relative scroll-mt-4 bg-background", className)}
     >
       <div

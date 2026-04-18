@@ -1,5 +1,5 @@
 import type { Config } from "@react-router/dev/config";
-import { PROJECT_SLUGS } from "./app/data/projects";
+import { projectSlugs } from "./app/content";
 
 export default {
   appDirectory: "app",
@@ -7,7 +7,7 @@ export default {
   async prerender({ getStaticPaths }) {
     return [
       ...getStaticPaths(),
-      ...PROJECT_SLUGS.map((slug) => `/${slug}`),
+      ...projectSlugs.map((slug) => `/${slug}`),
     ];
   },
 } satisfies Config;

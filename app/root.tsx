@@ -6,13 +6,15 @@ import {
   Outlet,
   Scripts,
 } from "react-router";
+import { getSiteContent } from "@/content";
 import { AppProviders } from "@/provider/app-providers";
+import { siteConfig } from "@/site.config";
 import type { Route } from "./+types/root";
 import "./app.css";
 
 export function Layout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en-US" className="no-scrollbar">
+    <html lang={siteConfig.defaultLanguage} className="no-scrollbar">
       <head>
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -36,15 +38,16 @@ export default function Root() {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  let message = "Oops!";
-  let details = "An unexpected error occurred.";
+  const errorBoundary = getSiteContent(siteConfig.defaultLanguage).ui.errorBoundary;
+  let message = errorBoundary.oops;
+  let details = errorBoundary.unexpectedDescription;
   let stack: string | undefined;
 
   if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? "404" : "Error";
+    message = error.status === 404 ? "404" : errorBoundary.errorTitle;
     details =
       error.status === 404
-        ? "The requested page could not be found."
+        ? errorBoundary.notFoundDescription
         : error.statusText || details;
   } else if (import.meta.env.DEV && error && error instanceof Error) {
     details = error.message;

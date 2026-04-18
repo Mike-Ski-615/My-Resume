@@ -1,9 +1,9 @@
-import { useIntl } from "react-intl";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TabsContent } from "@/components/ui/tabs";
-import type { LinkType, Project } from "@/data/projects";
+import { useSiteContent } from "@/hooks/useSiteContent";
 import { LINK_CONFIG } from "@/lib/project-links";
+import type { LinkType, Project } from "@/types";
 
 type OverviewTabProps = {
   project: Project;
@@ -18,11 +18,9 @@ type ProjectLinkItem = {
 };
 
 export function OverviewTab({ project }: OverviewTabProps) {
-  const intl = useIntl();
-  const statusLabel = intl.formatMessage({
-    id: `common.status.${project.status}`,
-  });
-  const stackTitle = intl.formatMessage({ id: "projectDetail.stack" });
+  const { ui } = useSiteContent();
+  const statusLabel = ui.common.status[project.status];
+  const stackTitle = ui.projectDetail.stackTitle;
   const linkItems = Object.entries(project.links ?? {})
     .map(([type, href]) => {
       const linkType = type as LinkType;
@@ -36,7 +34,7 @@ export function OverviewTab({ project }: OverviewTabProps) {
         type: linkType,
         href,
         Icon: config.icon,
-        label: intl.formatMessage({ id: config.messageId }),
+        label: ui.common.links[linkType],
         order: config.order,
       };
     })
@@ -47,12 +45,12 @@ export function OverviewTab({ project }: OverviewTabProps) {
     <TabsContent value="overview">
       <div className="flex w-full flex-col gap-4 p-4">
         <div className="flex items-start justify-between gap-3">
-          <h1 className="min-w-0 flex-1 text-2xl font-bold leading-tight tracking-tight text-title">
+          <h1 className="type-display min-w-0 flex-1 text-2xl font-bold leading-tight text-title">
             {project.name}
           </h1>
           <Badge
             variant="outline"
-            className="shrink-0 bg-muted text-foreground"
+            className="type-meta shrink-0 bg-muted text-foreground"
           >
             <span className="relative size-1.5 rounded-full bg-current before:absolute before:inset-0 before:animate-ping before:rounded-full before:bg-current" />
             <span>{statusLabel}</span>
@@ -78,7 +76,7 @@ export function OverviewTab({ project }: OverviewTabProps) {
         )}
 
         <div className="flex flex-col gap-2">
-          <h2 className="font-semibold text-title">{stackTitle}</h2>
+          <h2 className="type-display font-semibold text-title">{stackTitle}</h2>
           <div className="flex flex-wrap items-center gap-1.5">
             {project.stack.map((item) => (
               <Badge key={item} variant="secondary">

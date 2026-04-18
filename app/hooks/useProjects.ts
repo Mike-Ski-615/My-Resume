@@ -1,22 +1,17 @@
 import { useLanguage } from "@/provider/language-provider";
 import {
-  projectsByLocale,
-  type Project,
-  type ProjectLocale,
+  getSiteContent,
+  type ProjectRecord,
   type ProjectSlug,
-} from "@/data/projects";
-
-function toProjectLocale(locale: string): ProjectLocale {
-  return locale === "zh-CN" ? "zh" : "en";
-}
+} from "@/content";
 
 export function useProjects() {
   const { locale } = useLanguage();
-  return projectsByLocale[toProjectLocale(locale)];
+  return getSiteContent(locale).projects;
 }
 
 function hasProject(
-  projects: Record<ProjectSlug, Project>,
+  projects: ProjectRecord,
   slug: string,
 ): slug is ProjectSlug {
   return Object.hasOwn(projects, slug);

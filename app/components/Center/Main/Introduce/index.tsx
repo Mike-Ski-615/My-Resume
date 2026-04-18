@@ -4,44 +4,54 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Button } from "@/components/ui/button";
-import { useIntl } from "react-intl";
 import BadgeBar from "@/components/Center/Main/BadgeBar";
 import Reserve from "@/components/Center/Main/Reserve";
+import { useSiteContent } from "@/hooks/useSiteContent";
 import SendEmail from "../SendEmail";
 import AccountSection from "../AccountSection";
+import { siteConfig } from "@/site.config";
 
 export default function Introduce() {
-  const intl = useIntl();
+  const {
+    home: { about },
+  } = useSiteContent();
+  const hasContactActions = Boolean(
+    siteConfig.contact.bookingUrl?.trim() || siteConfig.resume.email.trim(),
+  );
 
   return (
-    <div className="flex flex-col items-start gap-3 p-4">
-      <p className="text-sm">
-        {intl.formatMessage({ id: "introduce.greeting" })}
+    <div className="flex max-w-3xl flex-col items-start gap-4 p-5 sm:p-6">
+      <p className="max-w-3xl text-sm leading-7 text-foreground/90">
+        {about.greeting}
       </p>
 
-      <p className="text-sm">
+      <p className="text-sm leading-7 text-foreground/90">
         <HoverCard openDelay={10} closeDelay={100}>
           <HoverCardTrigger asChild>
-            <Button variant="link" className="h-5 p-0">
-              {intl.formatMessage({ id: "introduce.school" })}
+            <Button
+              variant="link"
+              className="type-display h-5 p-0 text-[0.98rem] font-semibold tracking-[-0.02em]"
+            >
+              {about.school.name}
             </Button>
           </HoverCardTrigger>
-          <HoverCardContent className="flex w-64 flex-col gap-1">
-            <div className="font-semibold">
-              {intl.formatMessage({ id: "introduce.school" })}
-            </div>
-            <div>{intl.formatMessage({ id: "introduce.major" })}</div>
-            <div className="text-xs text-muted-foreground">
-              {intl.formatMessage({ id: "introduce.major_en" })}
+          <HoverCardContent className="flex w-64 flex-col gap-1 rounded-2xl border border-border/70 bg-popover/95 p-4 shadow-[0_24px_60px_-36px_rgba(15,23,42,0.4)] backdrop-blur-sm">
+            <div className="type-display font-semibold">{about.school.name}</div>
+            <div className="text-sm">{about.school.major}</div>
+            <div className="type-meta text-[0.7rem] text-muted-foreground">
+              {about.school.majorEnglish}
             </div>
           </HoverCardContent>
         </HoverCard>
-        {intl.formatMessage({ id: "introduce.status" })}
+        {" "}
+        {about.status}
       </p>
-      <div className="flex gap-2">
-        <Reserve />
-        <SendEmail />
-      </div>
+      {hasContactActions ? (
+        <div className="mt-1 flex flex-wrap gap-2.5">
+          <Reserve />
+          <SendEmail />
+        </div>
+      ) : null}
       <AccountSection />
       <BadgeBar />
     </div>

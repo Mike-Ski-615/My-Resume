@@ -10,49 +10,68 @@ import SkillsTechnologies from "@/components/Center/Main/SkillsTechnologies";
 import UserCard from "@/components/Center/Main/UserCard";
 import SectionFrame from "@/components/Center/SectionFrame";
 import { ScrollAnchorToc } from "@/components/ScrollAnchorToc";
+import { useSiteContent } from "@/hooks/useSiteContent";
 
 export default function Home() {
+  const { home } = useSiteContent();
+
   return (
     <>
       <ScrollAnchorToc />
 
-      <SectionFrame id="profile">
+      <SectionFrame id="profile" tocLabel={home.profile.tocLabel} tocDepth={2}>
         <UserCard />
       </SectionFrame>
 
-      <SectionFrame id="about">
+      <SectionFrame id="about" tocLabel={home.about.tocLabel} tocDepth={2}>
         <Introduce />
       </SectionFrame>
 
-      <SectionFrame id="projects">
+      <SectionFrame
+        id="projects"
+        tocLabel={home.projects.tocLabel}
+        tocDepth={2}
+      >
         <Projects />
       </SectionFrame>
 
-      <SectionFrame id="github">
+      <SectionFrame id="github" tocLabel={home.github.tocLabel} tocDepth={3}>
         <GithubHeatmap />
       </SectionFrame>
 
-      <SectionFrame id="experiences">
+      <SectionFrame
+        id="experiences"
+        tocLabel={home.experiences.tocLabel}
+        tocDepth={3}
+      >
         <Experiences />
       </SectionFrame>
 
-      <SectionFrame id="skills">
+      <SectionFrame id="skills" tocLabel={home.skills.tocLabel} tocDepth={3}>
         <SkillsTechnologies />
       </SectionFrame>
 
-      <SectionFrame id="now">
+      <SectionFrame id="now" tocLabel={home.now.tocLabel} tocDepth={2}>
         <Now />
       </SectionFrame>
 
-      <SectionFrame id="resume">
+      <SectionFrame id="resume" tocLabel={home.resume.tocLabel} tocDepth={2}>
         <Resume />
       </SectionFrame>
 
-      <SectionFrame id="newsletter">
+      <SectionFrame
+        id="newsletter"
+        tocLabel={home.newsletter.tocLabel}
+        tocDepth={3}
+      >
         <Newsletter />
       </SectionFrame>
 
-      <SectionFrame id="introduction">
+      <SectionFrame
+        id="introduction"
+        tocLabel={home.introduction.tocLabel}
+        tocDepth={2}
+      >
         <Introduction />
       </SectionFrame>
     </>

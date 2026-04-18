@@ -1,12 +1,13 @@
 import { IconArrowNarrowRight } from "@tabler/icons-react";
 import { useLayoutEffect } from "react";
-import { useIntl } from "react-intl";
 import { Link, useLocation, useViewTransitionState } from "react-router";
-import { PROJECT_SLUGS, type Project } from "@/data/projects";
 import SectionHeader from "@/components/Center/SectionHeader";
+import { projectSlugs } from "@/content";
+import { useSiteContent } from "@/hooks/useSiteContent";
 import { useProjects } from "@/hooks/useProjects";
 import { TransitionImage } from "@/components/TransitionImage";
 import { Badge } from "@/components/ui/badge";
+import type { Project } from "@/types";
 
 type ProjectReturnState = {
   viewTransitionProjectSlug?: string;
@@ -17,51 +18,55 @@ type ProjectCardData = Pick<
   "slug" | "cover" | "name" | "status" | "summary"
 >;
 
-function ProjectCard({ project }: { project: ProjectCardData }) {
-  const intl = useIntl();
+function ProjectCard({
+  project,
+  statusLabel,
+  viewDetailsLabel,
+}: {
+  project: ProjectCardData;
+  statusLabel: string;
+  viewDetailsLabel: string;
+}) {
   const projectHref = `/${project.slug}`;
   const isProjectTransitioning = useViewTransitionState(projectHref);
   const transitionName = isProjectTransitioning
     ? `project-cover-${project.slug}`
     : "none";
-  const statusLabel = intl.formatMessage({
-    id: `common.status.${project.status}`,
-  });
 
   return (
     <Link
       to={projectHref}
       viewTransition
       data-project-slug={project.slug}
-      className="group flex w-full flex-col p-4 text-left transition-colors hover:bg-muted/40"
+      className="group flex w-full flex-col p-5 text-left transition-colors hover:bg-muted/30 sm:p-6"
     >
-      <div className="flex flex-col gap-3 transition-all duration-300 group-hover:-translate-y-1">
+      <div className="flex flex-col gap-4 transition-all duration-300 group-hover:-translate-y-1">
         <TransitionImage
           transitionName={transitionName}
           src={project.cover}
           alt={project.name}
         />
 
-        <div className="flex flex-col gap-2 px-2">
+        <div className="flex flex-col gap-2.5 px-2.5">
           <div className="flex items-start justify-between gap-3">
-            <h3 className="min-w-0 flex-1 truncate text-xl font-semibold leading-tight tracking-tight text-foreground">
+            <h3 className="type-display min-w-0 flex-1 truncate text-xl font-semibold leading-tight text-foreground">
               {project.name}
             </h3>
 
             <Badge
               variant="outline"
-              className="shrink-0 bg-muted text-foreground"
+              className="type-meta shrink-0 bg-muted text-foreground"
             >
               <span className="relative size-1.5 rounded-full bg-current before:absolute before:inset-0 before:animate-ping before:rounded-full before:bg-current" />
               <span>{statusLabel}</span>
             </Badge>
           </div>
-          <p className="line-clamp-2 text-sm text-muted-foreground">
+          <p className="line-clamp-2 text-sm leading-6 text-muted-foreground">
             {project.summary}
           </p>
 
-          <span className="flex items-center gap-1 pt-1 text-sm font-medium text-muted-foreground transition-colors group-hover:text-foreground">
-            {intl.formatMessage({ id: "projectCard.viewDetails" })}
+          <span className="type-meta flex items-center gap-1 pt-2 text-sm font-medium text-muted-foreground transition-colors group-hover:text-foreground">
+            {viewDetailsLabel}
             <IconArrowNarrowRight data-icon="inline-end" />
           </span>
         </div>
@@ -71,7 +76,10 @@ function ProjectCard({ project }: { project: ProjectCardData }) {
 }
 
 export default function Projects() {
-  const intl = useIntl();
+  const {
+    home: { projects: projectsSection },
+    ui,
+  } = useSiteContent();
   const projectsBySlug = useProjects();
   const location = useLocation();
   const returnProjectSlug = (location.state as ProjectReturnState | null)
@@ -87,7 +95,7 @@ export default function Projects() {
       ?.scrollIntoView({ block: "center", inline: "nearest" });
   }, [returnProjectSlug]);
 
-  const projects = PROJECT_SLUGS.map<ProjectCardData>((slug) => {
+  const projects = projectSlugs.map<ProjectCardData>((slug) => {
     const project = projectsBySlug[slug];
     return {
       slug,
@@ -112,13 +120,19 @@ export default function Projects() {
   return (
     <>
       <SectionHeader>
-        {intl.formatMessage({ id: "introduce.projects" })}
+        {projectsSection.title}
       </SectionHeader>
       <div className="px-1">
         {projectRows.map((row, rowIndex) => (
           <div key={rowIndex}>
             <div className="md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:items-stretch">
-              {row[0] ? <ProjectCard project={row[0]} /> : null}
+              {row[0] ? (
+                <ProjectCard
+                  project={row[0]}
+                  statusLabel={ui.common.status[row[0].status]}
+                  viewDetailsLabel={projectsSection.viewDetailsLabel}
+                />
+              ) : null}
               <div className="double-divider md:hidden" />
               <div
                 className="relative hidden overflow-hidden md:block"
@@ -129,7 +143,13 @@ export default function Projects() {
                   style={{ width: 2000 }}
                 />
               </div>
-              {row[1] ? <ProjectCard project={row[1]} /> : null}
+              {row[1] ? (
+                <ProjectCard
+                  project={row[1]}
+                  statusLabel={ui.common.status[row[1].status]}
+                  viewDetailsLabel={projectsSection.viewDetailsLabel}
+                />
+              ) : null}
             </div>
             {rowIndex < projectRows.length - 1 && (
               <div className="double-divider" />

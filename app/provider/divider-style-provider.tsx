@@ -1,14 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-
-export type DividerStyle =
-  | "double-solid"
-  | "single-dashed"
-  | "soft-fade"
-  | "dot-chain"
-  | "hairline"
-  | "dash-dot"
-  | "center-glow"
-  | "woven-grid";
+import type { DividerStyle } from "@/types";
 
 type DividerStyleProviderProps = {
   children: React.ReactNode;

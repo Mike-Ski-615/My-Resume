@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { siteConfig } from "@/site.config";
+import type { SiteLanguage } from "@/types";
 
-export type Language = "en-US" | "zh-CN";
+export type Language = SiteLanguage;
 
 type LanguageProviderProps = {
   children: React.ReactNode;
@@ -14,7 +16,7 @@ type LanguageProviderState = {
 };
 
 const initialState: LanguageProviderState = {
-  locale: "en-US",
+  locale: siteConfig.defaultLanguage,
   setLocale: () => null,
 };
 
@@ -47,7 +49,7 @@ const getStoredLanguage = (
 
 export function LanguageProvider({
   children,
-  defaultLanguage = "en-US",
+  defaultLanguage = siteConfig.defaultLanguage,
   storageKey = "user-language",
 }: LanguageProviderProps) {
   const [locale, setLocale] = useState<Language>(defaultLanguage);

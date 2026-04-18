@@ -1,28 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useIntl } from "react-intl";
+import {
+  getVisibleHomeSectionsFromDocument,
+  type HomeSection,
+  type HomeSectionId,
+} from "@/home-sections";
+import { useSiteContent } from "@/hooks/useSiteContent";
 import { cn } from "@/lib/utils";
-
-const tocItems = [
-  { id: "profile", labelId: "anchor.profile", depth: 2 },
-  { id: "about", labelId: "anchor.about", depth: 2 },
-  { id: "projects", labelId: "anchor.projects", depth: 2 },
-  { id: "github", labelId: "anchor.github", depth: 3 },
-  { id: "experiences", labelId: "anchor.experiences", depth: 3 },
-  { id: "skills", labelId: "anchor.skills", depth: 3 },
-  { id: "now", labelId: "anchor.now", depth: 2 },
-  { id: "resume", labelId: "anchor.resume", depth: 2 },
-  { id: "newsletter", labelId: "anchor.newsletter", depth: 3 },
-  { id: "introduction", labelId: "anchor.introduction", depth: 2 },
-] as const;
 
 const itemHeight = 30;
 const linePadding = 5;
 const pathWidth = 48;
-const pathHeight = itemHeight * tocItems.length;
 
-type TocItemId = (typeof tocItems)[number]["id"];
-type LocalizedTocItem = (typeof tocItems)[number] & { label: string };
-type ScrollToSection = (id: TocItemId) => void;
+type LocalizedTocItem = HomeSection;
+type ScrollToSection = (id: HomeSectionId) => void;
 
 function getLineOffset(depth: number) {
   if (depth <= 2) {
@@ -40,7 +30,7 @@ function getItemOffset(depth: number) {
   return 52;
 }
 
-function getPosition(index: number, depth = tocItems[index].depth) {
+function getPosition(index: number, depth: HomeSection["depth"]) {
   const top = index * itemHeight + linePadding;
   const bottom = (index + 1) * itemHeight - linePadding;
   const x = getLineOffset(depth);
@@ -48,8 +38,8 @@ function getPosition(index: number, depth = tocItems[index].depth) {
   return { bottom, top, x, y: top + (bottom - top) / 2 };
 }
 
-function buildPath() {
-  return tocItems
+function buildPath(items: HomeSection[]) {
+  return items
     .map((item, index) => {
       const { bottom, top, x } = getPosition(index, item.depth);
 
@@ -57,30 +47,24 @@ function buildPath() {
         return `M ${x} ${top} L ${x} ${bottom}`;
       }
 
-      const previous = getPosition(index - 1);
+      const previous = getPosition(index - 1, items[index - 1].depth);
 
       return `C ${previous.x} ${top - 6} ${x} ${previous.bottom + 6} ${x} ${top} L ${x} ${bottom}`;
     })
     .join(" ");
 }
 
-const path = buildPath();
-
 export function ScrollAnchorToc() {
-  const intl = useIntl();
-  const [activeId, setActiveId] = useState<TocItemId>(tocItems[0].id);
+  const { ui } = useSiteContent();
+  const [items, setItems] = useState<LocalizedTocItem[]>([]);
+  const [activeId, setActiveId] = useState<HomeSectionId | null>(null);
   const [progress, setProgress] = useState(0);
   const [isMobileTocExpanded, setIsMobileTocExpanded] = useState(false);
   const mobileTocIdleTimer = useRef<number | null>(null);
+  const itemsRefreshFrame = useRef<number | null>(null);
 
-  const items = useMemo<LocalizedTocItem[]>(
-    () =>
-      tocItems.map((item) => ({
-        ...item,
-        label: intl.formatMessage({ id: item.labelId }),
-      })),
-    [intl],
-  );
+  const path = useMemo(() => buildPath(items), [items]);
+  const pathHeight = itemHeight * items.length;
 
   const expandMobileTocTemporarily = useCallback(() => {
     setIsMobileTocExpanded(true);
@@ -95,12 +79,70 @@ export function ScrollAnchorToc() {
   }, []);
 
   useEffect(() => {
+    const syncItems = () => {
+      const nextItems = getVisibleHomeSectionsFromDocument();
+      setItems(nextItems);
+      setActiveId((currentActiveId) => {
+        if (nextItems.length === 0) {
+          return null;
+        }
+
+        if (
+          currentActiveId &&
+          nextItems.some((item) => item.id === currentActiveId)
+        ) {
+          return currentActiveId;
+        }
+
+        return nextItems[0].id;
+      });
+    };
+
+    const requestItemsSync = () => {
+      if (itemsRefreshFrame.current !== null) {
+        cancelAnimationFrame(itemsRefreshFrame.current);
+      }
+
+      itemsRefreshFrame.current = requestAnimationFrame(() => {
+        itemsRefreshFrame.current = null;
+        syncItems();
+      });
+    };
+
+    syncItems();
+
+    const observer = new MutationObserver(() => {
+      requestItemsSync();
+    });
+
+    observer.observe(document.body, {
+      subtree: true,
+      childList: true,
+      characterData: true,
+      attributes: true,
+      attributeFilter: ["data-toc-section", "data-toc-depth", "data-toc-label", "id"],
+    });
+
+    return () => {
+      observer.disconnect();
+      if (itemsRefreshFrame.current !== null) {
+        cancelAnimationFrame(itemsRefreshFrame.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (items.length === 0) {
+      setProgress(0);
+      return;
+    }
+
     let frameId = 0;
 
     const update = () => {
       const maxScroll =
         document.documentElement.scrollHeight - window.innerHeight;
-      let nextActive: TocItemId = tocItems[0].id;
+      let nextActive: HomeSectionId = items[0].id;
       const viewportCenter = window.innerHeight / 2;
       let closestDistance = Number.POSITIVE_INFINITY;
       const topEdgeThreshold = 2;
@@ -113,16 +155,16 @@ export function ScrollAnchorToc() {
       );
 
       if (window.scrollY <= topEdgeThreshold) {
-        setActiveId(tocItems[0].id);
+        setActiveId(items[0].id);
         return;
       }
 
       if (maxScroll - window.scrollY <= bottomEdgeThreshold) {
-        setActiveId(tocItems[tocItems.length - 1].id);
+        setActiveId(items[items.length - 1].id);
         return;
       }
 
-      for (const item of tocItems) {
+      for (const item of items) {
         const section = document.getElementById(item.id);
         if (!section) {
           continue;
@@ -165,7 +207,7 @@ export function ScrollAnchorToc() {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", requestUpdate);
     };
-  }, [expandMobileTocTemporarily]);
+  }, [expandMobileTocTemporarily, items]);
 
   useEffect(() => {
     return () => {
@@ -200,6 +242,10 @@ export function ScrollAnchorToc() {
     window.history.replaceState(null, "", `#${id}`);
   };
 
+  if (items.length === 0 || activeId === null) {
+    return null;
+  }
+
   const activeIndex = Math.max(
     items.findIndex((item) => item.id === activeId),
     0,
@@ -207,7 +253,7 @@ export function ScrollAnchorToc() {
   const activePosition = getPosition(activeIndex, items[activeIndex].depth);
   const activeItem = items[activeIndex];
   const activeCount = `${activeIndex + 1}/${items.length}`;
-  const anchorLabel = intl.formatMessage({ id: "anchor.label" });
+  const anchorLabel = ui.scrollAnchor.label;
 
   return (
     <>
@@ -216,7 +262,9 @@ export function ScrollAnchorToc() {
         activePosition={activePosition}
         anchorLabel={anchorLabel}
         items={items}
-        title={intl.formatMessage({ id: "anchor.title" })}
+        path={path}
+        pathHeight={pathHeight}
+        title={ui.scrollAnchor.title}
         onSelect={scrollToSection}
       />
 
@@ -236,10 +284,12 @@ export function ScrollAnchorToc() {
 }
 
 type DesktopScrollAnchorTocProps = {
-  activeId: TocItemId;
+  activeId: HomeSectionId;
   activePosition: ReturnType<typeof getPosition>;
   anchorLabel: string;
   items: LocalizedTocItem[];
+  path: string;
+  pathHeight: number;
   title: string;
   onSelect: ScrollToSection;
 };
@@ -249,6 +299,8 @@ function DesktopScrollAnchorToc({
   activePosition,
   anchorLabel,
   items,
+  path,
+  pathHeight,
   title,
   onSelect,
 }: DesktopScrollAnchorTocProps) {
@@ -261,8 +313,10 @@ function DesktopScrollAnchorToc({
       className="fixed top-1/3 z-50 hidden w-44 -translate-y-1/2 lg:block left-[max(1rem,calc((100vw-43.125rem)/2-12rem))]"
     >
       <div className="flex flex-col gap-2">
-        <div className="flex h-7 items-center gap-3 text-sm font-medium text-muted-foreground">
-          <span className="font-semibold">{title}</span>
+        <div className="flex h-7 items-center gap-3 text-sm text-muted-foreground">
+          <span className="type-display text-sm font-semibold text-foreground/90">
+            {title}
+          </span>
         </div>
 
         <div className="relative">
@@ -340,7 +394,7 @@ function DesktopScrollAnchorToc({
 
 type MobileScrollAnchorTocProps = {
   activeCount: string;
-  activeId: TocItemId;
+  activeId: HomeSectionId;
   activeItem: LocalizedTocItem;
   anchorLabel: string;
   isExpanded: boolean;
@@ -414,7 +468,7 @@ function MobileTocSummary({ activeCount, activeItem }: MobileTocSummaryProps) {
       <span className="min-w-0 flex-1 truncate text-left font-medium text-primary">
         {activeItem.label}
       </span>
-      <span className="shrink-0 tabular-nums text-muted-foreground">
+      <span className="type-meta shrink-0 tabular-nums text-muted-foreground">
         {activeCount}
       </span>
     </>
@@ -458,7 +512,7 @@ function CollapsedMobileToc({
 
 type ExpandedMobileTocProps = {
   activeCount: string;
-  activeId: TocItemId;
+  activeId: HomeSectionId;
   activeItem: LocalizedTocItem;
   isExpanded: boolean;
   items: LocalizedTocItem[];
@@ -536,7 +590,7 @@ function ExpandedMobileToc({
         </div>
       </div>
 
-      <span className="w-8 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
+      <span className="type-meta w-8 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
         {activeCount}
       </span>
     </div>

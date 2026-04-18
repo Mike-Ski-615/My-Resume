@@ -6,117 +6,54 @@ import {
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import SectionHeader from "@/components/Center/SectionHeader";
-import { useIntl } from "react-intl";
+import { useSiteContent } from "@/hooks/useSiteContent";
+import type { ExperienceEntry } from "@/types";
 
-type Experience = {
-  id: string;
-  organizationId: string;
-  roleId: string;
-  employmentTypeId?: string;
-  periodId: string;
-  locationId: string;
-  logoText: string;
-  highlightIds: string[];
-};
-
-const experiences: Experience[] = [
-  {
-    id: "shanghai-byte-intern",
-    organizationId: "experiences.shanghaiByteIntern.organization",
-    roleId: "experiences.shanghaiByteIntern.role",
-    employmentTypeId: "experiences.shanghaiByteIntern.employmentType",
-    periodId: "experiences.shanghaiByteIntern.period",
-    locationId: "experiences.shanghaiByteIntern.location",
-    logoText: "B",
-    highlightIds: [
-      "experiences.shanghaiByteIntern.highlight.1",
-      "experiences.shanghaiByteIntern.highlight.2",
-      "experiences.shanghaiByteIntern.highlight.3",
-    ],
-  },
-  {
-    id: "shenzhen-commerce-intern",
-    organizationId: "experiences.shenzhenCommerceIntern.organization",
-    roleId: "experiences.shenzhenCommerceIntern.role",
-    employmentTypeId: "experiences.shenzhenCommerceIntern.employmentType",
-    periodId: "experiences.shenzhenCommerceIntern.period",
-    locationId: "experiences.shenzhenCommerceIntern.location",
-    logoText: "S",
-    highlightIds: [
-      "experiences.shenzhenCommerceIntern.highlight.1",
-      "experiences.shenzhenCommerceIntern.highlight.2",
-      "experiences.shenzhenCommerceIntern.highlight.3",
-    ],
-  },
-  {
-    id: "hangzhou-cloud-engineer",
-    organizationId: "experiences.hangzhouCloudEngineer.organization",
-    roleId: "experiences.hangzhouCloudEngineer.role",
-    employmentTypeId: "experiences.hangzhouCloudEngineer.employmentType",
-    periodId: "experiences.hangzhouCloudEngineer.period",
-    locationId: "experiences.hangzhouCloudEngineer.location",
-    logoText: "H",
-    highlightIds: [
-      "experiences.hangzhouCloudEngineer.highlight.1",
-      "experiences.hangzhouCloudEngineer.highlight.2",
-      "experiences.hangzhouCloudEngineer.highlight.3",
-    ],
-  },
-];
-
-function ExperienceItem({
-  experience,
-  intl,
-}: {
-  experience: Experience;
-  intl: ReturnType<typeof useIntl>;
-}) {
+function ExperienceItem({ experience }: { experience: ExperienceEntry }) {
   return (
     <AccordionItem
       value={experience.id}
-      className="group mx-1 border-b-0 px-4 transition-colors hover:bg-muted/40"
+      className="group mx-1 px-4 py-1 transition-colors hover:bg-muted/30 not-last:border-b-0 sm:px-5"
     >
-      <AccordionTrigger className="hover:no-underline">
+      <AccordionTrigger className="py-4 hover:no-underline">
         <div className="flex w-full flex-col items-start justify-between pr-2 sm:flex-row">
-          <div className="flex min-w-0 items-start gap-4">
-            <div className="flex size-14 shrink-0 items-center justify-center rounded-xl border bg-background shadow-sm">
-              <div className="flex size-10 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
+          <div className="flex min-w-0 items-start gap-5">
+            <div className="flex size-15 shrink-0 items-center justify-center rounded-2xl border border-border/70 bg-muted/25 shadow-[0_20px_45px_-34px_rgba(15,23,42,0.28)]">
+              <div className="type-display flex size-11 items-center justify-center rounded-xl bg-primary text-sm font-bold text-primary-foreground">
                 {experience.logoText}
               </div>
             </div>
 
             <div className="min-w-0 text-left">
               <div className="flex flex-wrap items-center gap-2">
-                <h3 className="text-lg font-semibold leading-none">
-                  {intl.formatMessage({ id: experience.organizationId })}
+                <h3 className="type-display text-lg font-semibold leading-none">
+                  {experience.organization}
                 </h3>
-                {experience.employmentTypeId && (
-                  <Badge variant="outline">
-                    {intl.formatMessage({ id: experience.employmentTypeId })}
+                {experience.employmentType ? (
+                  <Badge variant="outline" className="type-meta">
+                    {experience.employmentType}
                   </Badge>
-                )}
+                ) : null}
               </div>
-              <p className="text-sm text-muted-foreground">
-                {intl.formatMessage({ id: experience.roleId })}
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                {experience.role}
               </p>
             </div>
           </div>
 
-          <div className="mt-2 text-sm text-muted-foreground md:mt-0 md:text-right">
-            <p className="text-base font-semibold">
-              {intl.formatMessage({ id: experience.periodId })}
-            </p>
+          <div className="type-meta mt-2 text-sm text-muted-foreground md:mt-0 md:pl-4 md:text-right">
+            <p className="text-base font-semibold">{experience.period}</p>
             <p className="text-base text-muted-foreground">
-              {intl.formatMessage({ id: experience.locationId })}
+              {experience.location}
             </p>
           </div>
         </div>
       </AccordionTrigger>
 
       <AccordionContent>
-        <ul className="mt-2 flex flex-col gap-2 pl-2 text-sm text-muted-foreground md:pl-5">
-          {experience.highlightIds.map((highlightId) => (
-            <li key={highlightId}>{intl.formatMessage({ id: highlightId })}</li>
+        <ul className="mt-1 flex flex-col gap-2.5 pb-2 pl-3 text-sm leading-7 text-muted-foreground md:pl-5">
+          {experience.highlights.map((highlight) => (
+            <li key={highlight}>{highlight}</li>
           ))}
         </ul>
       </AccordionContent>
@@ -125,19 +62,19 @@ function ExperienceItem({
 }
 
 export default function Experiences() {
-  const intl = useIntl();
+  const {
+    home: { experiences },
+  } = useSiteContent();
 
   return (
     <>
-      <SectionHeader>
-        {intl.formatMessage({ id: "introduce.experiences" })}
-      </SectionHeader>
+      <SectionHeader>{experiences.title}</SectionHeader>
 
       <Accordion type="single" collapsible>
-        {experiences.map((experience, index) => (
+        {experiences.items.map((experience, index) => (
           <div key={experience.id}>
-            <ExperienceItem experience={experience} intl={intl} />
-            {index < experiences.length - 1 && (
+            <ExperienceItem experience={experience} />
+            {index < experiences.items.length - 1 && (
               <div className="double-divider" />
             )}
           </div>

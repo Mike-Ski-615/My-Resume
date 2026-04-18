@@ -1,6 +1,6 @@
 import { TransitionImage } from "@/components/TransitionImage";
-import type { Project } from "@/data/projects";
 import { useViewTransitionState } from "react-router";
+import type { Project } from "@/types";
 
 type ImageProps = {
   project: Project;

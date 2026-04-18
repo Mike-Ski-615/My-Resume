@@ -3,19 +3,21 @@ import { Badge } from "@/components/ui/badge";
 import SectionHeader from "@/components/Center/SectionHeader";
 import { IconCheck, IconCopy, IconDownload } from "@tabler/icons-react";
 import { useState } from "react";
-import { useIntl } from "react-intl";
-
-const resumePath = "/documents/resume-mike-ski.md";
-const emailAddress = "gvjk0631@gmail.com";
+import { useSiteContent } from "@/hooks/useSiteContent";
+import { siteConfig } from "@/site.config";
 
 export default function Resume() {
-  const intl = useIntl();
+  const {
+    home: { resume },
+  } = useSiteContent();
   const [isEmailCopied, setIsEmailCopied] = useState(false);
+  const resumeEmail = siteConfig.resume.email.trim();
+  const hasResumeEmail = Boolean(resumeEmail);
 
   const handleCopyEmail = async () => {
-    if (!navigator.clipboard) return;
+    if (!navigator.clipboard || !hasResumeEmail) return;
 
-    await navigator.clipboard.writeText(emailAddress);
+    await navigator.clipboard.writeText(resumeEmail);
     setIsEmailCopied(true);
 
     setTimeout(() => {
@@ -25,53 +27,58 @@ export default function Resume() {
 
   return (
     <>
-      <SectionHeader>{intl.formatMessage({ id: "resume.title" })}</SectionHeader>
+      <SectionHeader>{resume.title}</SectionHeader>
 
-      <div className="flex flex-col gap-4 p-4">
-        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+      <div className="p-5 sm:p-6">
+        <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
           <div className="min-w-0 flex flex-col gap-2">
             <div className="flex flex-wrap gap-2">
-              <Badge variant="secondary">
-                {intl.formatMessage({ id: "resume.badge.available" })}
+              <Badge variant="secondary" className="type-meta">
+                {resume.badges.available}
               </Badge>
-              <Badge variant="outline">
-                {intl.formatMessage({ id: "resume.badge.updated" })}
+              <Badge variant="outline" className="type-meta">
+                {resume.badges.updated}
               </Badge>
             </div>
 
             <div className="flex flex-col gap-1">
-              <h3 className="text-base font-semibold leading-tight">
-                {intl.formatMessage({ id: "resume.heading" })}
+              <h3 className="type-display text-[1.02rem] font-semibold leading-tight">
+                {resume.heading}
               </h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                {intl.formatMessage({ id: "resume.description" })}
+              <p className="max-w-2xl text-sm leading-7 text-muted-foreground">
+                {resume.description}
               </p>
             </div>
           </div>
 
           <div className="flex shrink-0 flex-wrap gap-2">
-            <Button size="sm" asChild>
-              <a href={resumePath} download="mike-ski-resume.md">
+            <Button size="sm" className="type-meta" asChild>
+              <a
+                href={siteConfig.resume.href}
+                download={siteConfig.resume.downloadName}
+              >
                 <IconDownload data-icon="inline-start" />
-                {intl.formatMessage({ id: "resume.download" })}
+                {resume.downloadLabel}
               </a>
             </Button>
 
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-24"
-              onClick={handleCopyEmail}
-            >
-              {isEmailCopied ? (
-                <IconCheck data-icon="inline-start" />
-              ) : (
-                <IconCopy data-icon="inline-start" />
-              )}
-              {intl.formatMessage({
-                id: isEmailCopied ? "resume.emailCopied" : "resume.copyEmail",
-              })}
-            </Button>
+            {hasResumeEmail ? (
+              <Button
+                variant="outline"
+                size="sm"
+                className="type-meta w-26"
+                onClick={handleCopyEmail}
+              >
+                {isEmailCopied ? (
+                  <IconCheck data-icon="inline-start" />
+                ) : (
+                  <IconCopy data-icon="inline-start" />
+                )}
+                {isEmailCopied
+                  ? resume.emailCopiedLabel
+                  : resume.copyEmailLabel}
+              </Button>
+            ) : null}
           </div>
         </div>
       </div>
