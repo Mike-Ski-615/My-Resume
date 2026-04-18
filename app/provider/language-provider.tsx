@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { siteConfig } from "@/site.config";
+import { siteConfig } from "@/site/config";
 import type { SiteLanguage } from "@/types";
 
 export type Language = SiteLanguage;
@@ -37,7 +37,10 @@ const getStoredLanguage = (
 
   try {
     const storedLanguage = window.localStorage.getItem(storageKey);
-    if (storedLanguage && LANGUAGE_VALUES.includes(storedLanguage as Language)) {
+    if (
+      storedLanguage &&
+      LANGUAGE_VALUES.includes(storedLanguage as Language)
+    ) {
       return storedLanguage as Language;
     }
   } catch {

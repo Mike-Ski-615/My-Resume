@@ -2,7 +2,7 @@ import { ModeToggle } from "@/components/ModeToggle";
 import VisitorCount from "@/components/Center/Main/VisitorCount";
 import { RoleCycle } from "@/components/Center/Main/RoleCycle";
 import { useSiteContent } from "@/hooks/useSiteContent";
-import { siteConfig } from "@/site.config";
+import { siteConfig } from "@/site/config";
 
 export default function UserCard() {
   const {

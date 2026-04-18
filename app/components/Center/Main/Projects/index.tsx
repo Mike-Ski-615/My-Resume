@@ -119,9 +119,7 @@ export default function Projects() {
 
   return (
     <>
-      <SectionHeader>
-        {projectsSection.title}
-      </SectionHeader>
+      <SectionHeader>{projectsSection.title}</SectionHeader>
       <div className="px-1">
         {projectRows.map((row, rowIndex) => (
           <div key={rowIndex}>

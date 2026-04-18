@@ -224,8 +224,7 @@ const projects = defineProjects({
       "Prettier",
     ],
     links: {
-      github:
-        "https://github.com/Mike-Ski-615/Next.js-Authentication-Scaffold",
+      github: "https://github.com/Mike-Ski-615/Next.js-Authentication-Scaffold",
       readme:
         "https://github.com/Mike-Ski-615/Next.js-Authentication-Scaffold#readme",
       issues:

@@ -65,7 +65,12 @@ export function OverviewTab({ project }: OverviewTabProps) {
         {linkItems.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {linkItems.map(({ type, href, Icon, label }) => (
-              <Button key={`${type}-${href}`} asChild variant="outline" size="sm">
+              <Button
+                key={`${type}-${href}`}
+                asChild
+                variant="outline"
+                size="sm"
+              >
                 <a href={href} target="_blank" rel="noreferrer">
                   <Icon data-icon="inline-start" />
                   {label}
@@ -76,7 +81,9 @@ export function OverviewTab({ project }: OverviewTabProps) {
         )}
 
         <div className="flex flex-col gap-2">
-          <h2 className="type-display font-semibold text-title">{stackTitle}</h2>
+          <h2 className="type-display font-semibold text-title">
+            {stackTitle}
+          </h2>
           <div className="flex flex-wrap items-center gap-1.5">
             {project.stack.map((item) => (
               <Badge key={item} variant="secondary">

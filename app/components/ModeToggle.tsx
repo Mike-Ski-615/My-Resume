@@ -23,9 +23,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useSiteContent } from "@/hooks/useSiteContent";
 import { cn } from "@/lib/utils";
-import {
-  useDividerStyle,
-} from "@/provider/divider-style-provider";
+import { useDividerStyle } from "@/provider/divider-style-provider";
 import { type Language, useLanguage } from "@/provider/language-provider";
 import { useTheme } from "@/provider/theme-provider";
 import type { DividerStyle, Theme } from "@/types";
@@ -112,11 +110,7 @@ export function ModeToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          size="icon"
-          aria-label={settings.buttonAria}
-        >
+        <Button variant="outline" size="icon" aria-label={settings.buttonAria}>
           <Settings data-icon="inline-start" />
         </Button>
       </DropdownMenuTrigger>

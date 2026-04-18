@@ -4,7 +4,7 @@ import SectionHeader from "@/components/Center/SectionHeader";
 import { IconCheck, IconCopy, IconDownload } from "@tabler/icons-react";
 import { useState } from "react";
 import { useSiteContent } from "@/hooks/useSiteContent";
-import { siteConfig } from "@/site.config";
+import { siteConfig } from "@/site/config";
 
 export default function Resume() {
   const {

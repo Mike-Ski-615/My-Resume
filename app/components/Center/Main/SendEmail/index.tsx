@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { IconMail } from "@tabler/icons-react";
 import { useSiteContent } from "@/hooks/useSiteContent";
-import { siteConfig } from "@/site.config";
+import { siteConfig } from "@/site/config";
 
 export default function SendEmail() {
   const { ui } = useSiteContent();

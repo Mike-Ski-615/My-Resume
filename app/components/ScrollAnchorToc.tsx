@@ -3,7 +3,7 @@ import {
   getVisibleHomeSectionsFromDocument,
   type HomeSection,
   type HomeSectionId,
-} from "@/home-sections";
+} from "@/site/home-sections";
 import { useSiteContent } from "@/hooks/useSiteContent";
 import { cn } from "@/lib/utils";
 

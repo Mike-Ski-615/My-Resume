@@ -9,7 +9,7 @@ import Reserve from "@/components/Center/Main/Reserve";
 import { useSiteContent } from "@/hooks/useSiteContent";
 import SendEmail from "../SendEmail";
 import AccountSection from "../AccountSection";
-import { siteConfig } from "@/site.config";
+import { siteConfig } from "@/site/config";
 
 export default function Introduce() {
   const {

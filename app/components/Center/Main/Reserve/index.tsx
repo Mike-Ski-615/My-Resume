@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { IconCalendarWeek } from "@tabler/icons-react";
 import { useSiteContent } from "@/hooks/useSiteContent";
-import { siteConfig } from "@/site.config";
+import { siteConfig } from "@/site/config";
 
 export default function Reserve() {
   const { ui } = useSiteContent();

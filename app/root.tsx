@@ -8,7 +8,7 @@ import {
 } from "react-router";
 import { getSiteContent } from "@/content";
 import { AppProviders } from "@/provider/app-providers";
-import { siteConfig } from "@/site.config";
+import { siteConfig } from "@/site/config";
 import type { Route } from "./+types/root";
 import "./app.css";
 

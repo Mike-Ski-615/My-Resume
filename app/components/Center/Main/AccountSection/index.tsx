@@ -5,7 +5,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { useSiteContent } from "@/hooks/useSiteContent";
-import { siteConfig } from "@/site.config";
+import { siteConfig } from "@/site/config";
 import type { SocialLinkConfig } from "@/types";
 
 function SocialHoverCardItem({ social }: { social: SocialLinkConfig }) {
@@ -61,9 +61,7 @@ export default function AccountSection() {
     <div className="flex flex-col gap-2">
       <p>
         {ui.actions.accountPrefix}{" "}
-        <span className="font-semibold">
-          {ui.actions.accountHighlight}
-        </span>
+        <span className="font-semibold">{ui.actions.accountHighlight}</span>
       </p>
       <div className="flex flex-wrap gap-2">
         {socialLinks.map((social) => (
